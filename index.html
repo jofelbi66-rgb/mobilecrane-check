@@ -237,17 +237,31 @@ let lastPdfDriver = '';
       <p class="help">Versand per Google-Relay mit PDF-Anhang. Adressen werden nur lokal gespeichert.</p>
     </section>
 
-    <section>
-      <h2>Fahrzeugdaten</h2>
-      <div class="grid grid-2">
-        <label><span>Datum/Uhrzeit</span><input id="inDate" type="text" placeholder="Datum / Uhrzeit"></label>
-        <label><span>Fahrer/in *</span><input id="inOp" placeholder="Fahrer/in"></label>
-        <label><span>Zugmaschine *</span><input id="inTr" placeholder="z.B. DN-AB 1234"></label>
-        <label><span>Auflieger/Modul *</span><input id="inTl" placeholder="…"></label>
-        <label class="grid-col-span-2"><span>Ort</span><input id="inLoc" placeholder="automatisch per GPS oder manuell"></label>
-      </div>
-      <div class="status" id="geoOut" style="margin-top:6px"></div>
-    </section>
+   <section>
+  <h2>Einsatzdaten Mobilkran</h2>
+  <div class="grid grid-2">
+    <label><span>Datum/Uhrzeit</span>
+      <input id="inDate" type="text" placeholder="Datum / Uhrzeit">
+    </label>
+
+    <label><span>Kranführer/in *</span>
+      <input id="inOp" placeholder="Name Kranführer/in">
+    </label>
+
+    <label><span>Kran (Kennzeichen/Typ) *</span>
+      <input id="inTr" placeholder="z. B. DN-AB 1234 / LTM 1070">
+    </label>
+
+    <label><span>Projekt / Baustelle *</span>
+      <input id="inTl" placeholder="z. B. Baustelle XY / Projektname">
+    </label>
+
+    <label class="grid-col-span-2"><span>Einsatzort</span>
+      <input id="inLoc" placeholder="automatisch per GPS oder manuell">
+    </label>
+  </div>
+  <div class="status" id="geoOut" style="margin-top:6px"></div>
+</section>
 
     <section>
       <h2>Logo für Bericht (optional)</h2>
