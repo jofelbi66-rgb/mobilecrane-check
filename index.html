@@ -1026,9 +1026,10 @@ async function onMail() {
       ? dateField.value
       : formatNowForDisplay(); // Fallback
 
-    const tr  = document.getElementById('inTr')?.value || 'Zugmaschine';
-    const tl  = document.getElementById('inTl')?.value || 'Auflieger/Modul';
-    const drv = document.getElementById('inOp')?.value || 'Fahrer/in';
+    const tr  = document.getElementById('inTr')?.value || 'Kran';
+const tl  = document.getElementById('inTl')?.value || 'Projekt/Baustelle';
+const drv = document.getElementById('inOp')?.value || 'Kranführer/in';
+
 
     // Gesamtstatus automatisch ermitteln: Mangel > Hinweis > OK
     const overallStatus = (() => {
@@ -1058,8 +1059,10 @@ async function onMail() {
       `[Fahrzeugkontrolle] ${overallStatus} – ${tr} / ${tl} – ${dtMail} – ${drv}`;
 
     // Dateiname aufräumen
+   
     const safeDate = dtMail.replace(/[^\wäöüÄÖÜß]+/g, '_');
-    const filename = `Fahrzeugkontrolle_${tr}_${tl}_${safeDate}.pdf`;
+const filename = `Mobilkran_Kontrolle_${tr}_${tl}_${safeDate}.pdf`;
+
 
     // Body-Text: Hauptgruppen + Status
     const lines = items.map(it => {
