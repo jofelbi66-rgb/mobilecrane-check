@@ -1,0 +1,1494 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Fahrzeugkontrolle – Schwerlast (GitHub Pages)</title>
+
+  <!-- App-/Theme -->
+  <meta name="theme-color" content="#0076BC">
+  <meta name="apple-mobile-web-app-title" content="Check dein Fahrzeug">
+  <meta name="color-scheme" content="light">
+
+<!-- Favicons / Touch-Icons -->
+<link rel="icon" type="image/png" sizes="32x32" href="./icon-32.png?v=12">
+<link rel="apple-touch-icon" sizes="180x180" href="./icon-180.png?v=12">
+<link rel="manifest" href="./manifest.json?v=12">
+
+
+
+
+  <style>
+    :root{--b:#e2e8f0;--mut:#64748b;--ok:#059669;--warn:#d97706;--bad:#dc2626}
+    *{box-sizing:border-box}
+    body{margin:0;font:12px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#f8fafc;color:#0f172a}
+    header{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--b);z-index:5}
+    .wrap{max-width:980px;margin:0 auto;padding:10px}
+    h1{margin:0;font-size:20px} h2{margin:0 0 10px;font-size:18px}
+    section{background:#fff;border:1px solid var(--b);border-radius:12px;padding:14px;margin:12px 0}
+    .grid{display:grid;gap:10px}
+    @media(min-width:720px){.grid-2{grid-template-columns:1fr 1fr}}
+    label span{font-size:14px;font-weight:600}
+    input,textarea{width:100%;padding:12px;border:1px solid var(--b);border-radius:10px;font:inherit}
+    textarea{min-height:56px;resize:vertical}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .btn{padding:10px 14px;border:1px solid var(--b);background:#fff;border-radius:10px;cursor:pointer;font-weight:600}
+    .btn:hover{background:#f1f5f9}
+    .btn.ok.active{background:var(--ok);color:#fff}
+    .btn.warn.active{background:var(--warn);color:#fff}
+    .btn.bad.active{background:var(--bad);color:#fff}
+    .chip{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;border:1px solid var(--b);background:#eef2ff}
+    .card{border:1px solid var(--b);border-radius:10px;padding:10px}
+    .status{font-size:14px;color:#64748b}
+    .photos{display:flex;gap:8px;overflow:auto}
+    .ph{position:relative;width:92px;height:92px;border:1px solid var(--b);border-radius:8px;overflow:hidden;background:#f8fafc}
+    .ph img{width:100%;height:100%;object-fit:cover}
+    .x{position:absolute;right:4px;top:4px;width:22px;height:22px;border-radius:11px;border:1px solid var(--b);background:#fff;cursor:pointer;line-height:20px;text-align:center;font-size:14px}
+    footer{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--b)}
+    .help{font-size:12px;color:#475569}
+    .item-desc {
+  margin: 4px 0 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: pre-line;  /* behält Zeilenumbrüche aus \n */
+  color: #334155;
+}
+.checkpoints {
+  margin: 4px 0 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: pre-line;   /* zeigt \n als Zeilenumbruch */
+  color: #334155;
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 8px;
+  border: 1px solid #e5e7eb;
+}
+textarea.autogrow { height:auto; min-height:64px; overflow:hidden; resize:none; }
+@media (max-width: 720px){
+  .checkpoints { font-size: 12px; }
+  textarea.autogrow { font-size: 12px; line-height: 1.35; }
+}
+/* Grundlayout der Checkkarten */
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 2px rgba(15,23,42,0.08);
+  border: 1px solid #e5e7eb;
+}
+
+/* Zeilen innerhalb der Karte */
+.card .row {
+  display: flex;
+  align-items: center;
+}
+
+/* Fester Prüfpunkte-Block */
+.checkpoints{
+  margin: 4px 0 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: pre-line;
+  color: #334155;
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+/* Buttons OK / Hinweis / Mangel – kompakt */
+.card .btn {
+  flex: 1 1 0;
+  font-size: 13px;
+  padding: 6px 4px;
+  border-radius: 999px;
+}
+
+/* Kommentarfeld */
+textarea.autogrow{
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 1.4;
+  min-height: 60px;
+  resize: none;
+  border-radius: 8px;
+  border: 1px solid #cbd5f5;
+  padding: 6px 8px;
+}
+
+/* Fotos-Container */
+.photos{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+.photos img{
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+}
+
+/* Mobile-Optimierung */
+@media (max-width: 720px){
+  .card{
+    padding: 8px 10px;
+    margin-bottom: 8px;
+  }
+  .checkpoints{
+    font-size: 12px;
+  }
+  textarea.autogrow{
+    font-size: 12px;
+    line-height: 1.35;
+  }
+}
+/* ----- Signaturbereich kompakt ----- */
+.signature-block {
+  margin-top: 12px;
+}
+
+.signature-block h2 {
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.signature-note {
+  font-size: 10px;
+  color: #333;
+  margin-bottom: 6px;
+}
+
+.sig-card {
+  overflow: hidden;
+  border: 1px solid var(--b);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.sig-row {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.sig-row .btn {
+  padding: 6px 12px;
+  font-size: 11px;
+  border-radius: 6px;
+}
+
+footer {
+  margin-top: 10px;
+  font-size: 9px;
+  text-align: center;
+  color: #666;
+}
+// letzter Fahrername für die PDF-Fußzeile
+let lastPdfDriver = '';
+
+
+    
+  </style>
+</head>
+<body>
+  <!-- Logo fest vorladen (für PDF) -->
+  <img id="felberLogo"
+       src="https://jofelbi66-rgb.github.io/Fahrzeugkontrolle/felbermayr_logo.png?v=7"
+       alt="Felbermayr Logo"
+       style="display:none"
+       crossorigin="anonymous">
+
+  <header>
+    <div class="wrap row" style="justify-content:space-between">
+      <h1>Fahrzeugkontrolle – Schwerlast/Zugmaschine</h1>
+
+    
+<div class="row">
+  <button class="btn" id="btnGeo">GPS-Ort</button>
+  <button class="btn" id="btnPdf">PDF speichern</button>
+  <button class="btn" id="btnMail">An Dispo (E-Mail + PDF)</button>
+  <button class="btn" id="btnReset" onclick="confirmReset()">Reset</button>
+</div>
+
+
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section>
+      <h2>Empfänger / Versand</h2>
+      <div class="grid grid-2">
+        <label><span>Dispo-E-Mail</span>
+          <input id="inDispo" value="Dispo-Memmingen@felbermayr.cc" disabled>
+        </label>
+        <label><span>CC (optional)</span><input id="inCc" placeholder="cc@firma.de"></label>
+      </div>
+      <label><span>BCC (optional)</span><input id="inBcc" placeholder="bcc@firma.de"></label>
+      <p class="help">Versand per Google-Relay mit PDF-Anhang. Adressen werden nur lokal gespeichert.</p>
+    </section>
+
+    <section>
+      <h2>Fahrzeugdaten</h2>
+      <div class="grid grid-2">
+        <label><span>Datum/Uhrzeit</span><input id="inDate" type="text" placeholder="Datum / Uhrzeit"></label>
+        <label><span>Fahrer/in *</span><input id="inOp" placeholder="Fahrer/in"></label>
+        <label><span>Zugmaschine *</span><input id="inTr" placeholder="z.B. DN-AB 1234"></label>
+        <label><span>Auflieger/Modul *</span><input id="inTl" placeholder="…"></label>
+        <label class="grid-col-span-2"><span>Ort</span><input id="inLoc" placeholder="automatisch per GPS oder manuell"></label>
+      </div>
+      <div class="status" id="geoOut" style="margin-top:6px"></div>
+    </section>
+
+    <section>
+      <h2>Logo für Bericht (optional)</h2>
+      <div class="row">
+        <input type="file" id="inLogo" accept="image/*">
+        <span class="help">Einmal auswählen → wird klein gespeichert (PDF bleibt &lt; 200 kB).</span>
+      </div>
+      <div id="logoInfo" class="status"></div>
+    </section>
+
+    <section>
+      <h2>Checkliste (mit Fotos)</h2>
+      <div id="checklist"></div>
+      <p class="status">Fotos werden stark komprimiert.</p>
+    </section>
+
+ <section class="signature-block">
+  <h2>Unterschrift</h2>
+
+  <p class="signature-note">
+    Durch meine Unterschrift bestätige ich Überprüfung sämtlicher Punkte.
+  </p>
+
+  <div class="card sig-card">
+    <canvas id="sig" style="touch-action:none;width:100%;height:120px;"></canvas>
+  </div>
+
+  <div class="row sig-row">
+    <button class="btn" id="btnClearSig">Löschen</button>
+    <button class="btn" id="btnSaveSig">Übernehmen</button>
+    <span id="sigStatus" class="status" style="display:none;color:#047857;">Gespeichert ✓</span>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div id="status" class="status">Bereit</div>
+  </div>
+</footer>
+
+ 
+  <!-- jsPDF -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+  <script>
+  (function(){
+    function formatNowForDisplay(){
+  const now   = new Date();
+  const yyyy  = now.getFullYear();
+  const mm    = String(now.getMonth() + 1).padStart(2, '0');
+  const dd    = String(now.getDate()).padStart(2, '0');
+  const hh    = String(now.getHours()).padStart(2, '0');
+  const mi    = String(now.getMinutes()).padStart(2, '0');
+  // Deutsche Schreibweise inkl. Uhrzeit
+  return `${dd}.${mm}.${yyyy} ${hh}:${mi}`;
+}
+// Datum + Uhrzeit formatiert (deutsches Format)
+function formatNowForDisplay() {
+  const now   = new Date();
+  const yyyy  = now.getFullYear();
+  const mm    = String(now.getMonth() + 1).padStart(2, '0');
+  const dd    = String(now.getDate()).padStart(2, '0');
+  const hh    = String(now.getHours()).padStart(2, '0');
+  const mi    = String(now.getMinutes()).padStart(2, '0');
+  return `${dd}.${mm}.${yyyy} ${hh}:${mi}`;
+}
+
+
+    
+    const { jsPDF } = window.jspdf;
+    const $ = s => document.querySelector(s);
+    const SKEY='fahrzeugkontrolle_pages_single';
+    let state = JSON.parse(localStorage.getItem(SKEY) || '{}');
+    state.res=state.res||{}; state.geo=state.geo||null; state.logo=state.logo||null; state.logoAspect=state.logoAspect||1; state.lockRecipients=true;
+
+// NEU: 5 Hauptgruppen (alten items-Array komplett ersetzen)
+const items = [
+  {
+    id: "docs",
+    title: "Allgemeine Vorbereitung & Dokumentation",
+    
+    description:
+      "Prüfe:\n- Vollständigkeit der Transportdokumente (Beladegutachten, Frachtbrief, Genehmigungen)\n- Eintragungen und Zeitplan für den Transport\n- Lesbarkeit und Aktualität aller Unterlagen\n- Gültigkeit der Fahrerlaubnis und Fahrzeugpapiere",
+    category: "Dokumentation"
+  },
+  {
+    id: "vehicle",
+    title: "Fahrzeugtechnische Kontrolle",
+    
+    description:
+      "Prüfe:\n- Zustand und Funktion von Bremsanlage und Hydrauliksystem\n- Beleuchtung, Rundumkennleuchten und Signaltechnik\n- Dichtheit (keine Öl- oder Hydrauliklecks)\n- Vorhandensein von Ölbindemittel / Auffangwannen\n- Reifen, Felgen und Radmuttern auf festen Sitz",
+    category: "Fahrzeug"
+  },
+  {
+    id: "load",
+    title: "Ladung & Ladehilfsmittel",
+    
+    description:
+      "Prüfe:\n- Ladung form- und kraftschlüssig gesichert\n- Ladehilfsmittel und Zubehör (Ketten, Traversen, Balken) fixiert\n- Zustand und Zulassung der Zurrmittel\n- Ladefläche frei von Restladung, Schmutz und Öl",
+    category: "Ladung"
+  },
+  {
+    id: "environment",
+    title: "Umwelt- & Leckageschutz",
+    
+     description:
+      "Prüfe:\n- Keine Leckagen an Hydraulik, Motor oder Getriebe\n- Öl- und Kraftstoffbehälter dicht\n- Auffangsysteme korrekt positioniert und leer\n- Keine Flüssigkeiten auf der Ladefläche oder im Umfeld\n- Umweltgefährdende Stoffe ordnungsgemäß gesichert",
+    category: "Umwelt"
+  },
+  {
+    id: "safety",
+    title: "Umfeld & Arbeitssicherheit",
+   
+    description:
+      "Prüfe:\n- Umgebung frei von Hindernissen und Stolperstellen\n- PSA (Helm, Warnweste, Handschuhe) vollständig getragen\n- Funk-/Sichtverbindung zum Einweiser vorhanden\n- Fahrweg und Wendeflächen kontrolliert\n- Beleuchtung der Arbeitsumgebung ausreichend",
+    category: "Sicherheit"
+  }
+];
+// Schritt C – Beschreibungen in Platzhalter schreiben
+const mapById = Object.fromEntries(items.map(it => [it.id, it]));
+document.querySelectorAll('.item-desc').forEach(el => {
+  const id = el.dataset.id;
+  el.textContent = mapById[id]?.description || '';
+});
+    
+// --- DIAGNOSE START ---
+console.log('[INIT] Script geladen');
+window.addEventListener('DOMContentLoaded', ()=>{
+  console.log('[INIT] DOMContentLoaded fired');
+
+  const ck = document.getElementById('checklist');
+  console.log('[INIT] #checklist:', !!ck);
+  if (!ck) {
+    alert('FEHLT: <div id="checklist"></div> im HTML.');
+  }
+
+  const sig = document.getElementById('sig');
+  console.log('[INIT] #sig canvas:', !!sig);
+  if (!sig) {
+    alert('FEHLT: <canvas id="sig"></canvas> im HTML.');
+  }
+
+  try {
+    console.log('[INIT] renderChecklist vorhanden:', typeof renderChecklist);
+    if (typeof renderChecklist === 'function') {
+      renderChecklist();
+      console.log('[INIT] renderChecklist aufgerufen');
+    } else {
+      alert('renderChecklist ist nicht definiert – Script wurde vorher abgebrochen.');
+    }
+  } catch (e) {
+    console.error('[INIT] Fehler bei renderChecklist:', e);
+    alert('Fehler bei renderChecklist: ' + (e?.message || e));
+  }
+
+  try {
+    if (typeof initSignature === 'function') {
+      initSignature();
+      console.log('[INIT] initSignature aufgerufen');
+    } else {
+      alert('initSignature ist nicht definiert – Script wurde vorher abgebrochen.');
+    }
+  } catch (e) {
+    console.error('[INIT] Fehler bei initSignature:', e);
+    alert('Fehler bei initSignature: ' + (e?.message || e));
+  }
+});
+// --- DIAGNOSE ENDE ---
+
+
+// -------- Signatur-Setup (MUSS vor dem DOMContentLoaded stehen) --------
+function initSignature(){
+  const c = document.getElementById('sig');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+
+  function size(){
+    const w = c.clientWidth, h = 170, px = window.devicePixelRatio || 1;
+    c.style.width = w + 'px';
+    c.style.height = h + 'px';
+    c.width  = Math.round(w * px);
+    c.height = Math.round(h * px);
+    ctx.setTransform(px,0,0,px,0,0);
+    ctx.lineWidth = 2;
+    ctx.lineCap   = 'round';
+    ctx.strokeStyle = '#111827';
+  }
+  size();
+  window.addEventListener('resize', size);
+
+  let down=false,last=null;
+  const P=e=>{const r=c.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
+  c.addEventListener('pointerdown',e=>{down=true;last=P(e);});
+  c.addEventListener('pointerup',  ()=>{down=false;last=null;});
+  c.addEventListener('pointerleave',()=>{down=false;last=null;});
+  c.addEventListener('pointermove',e=>{
+    if(!down) return;
+    const p=P(e);
+    ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(p.x,p.y); ctx.stroke();
+    last=p;
+  });
+
+  const save=document.getElementById('btnSaveSig');
+  const clr =document.getElementById('btnClearSig');
+  if (clr)  clr.onclick  = ()=>{ ctx.clearRect(0,0,c.width,c.height); state.sig=''; document.getElementById('sigStatus').style.display='none'; persist(); };
+  if (save) save.onclick = ()=>{ state.sig=c.toDataURL('image/png'); document.getElementById('sigStatus').style.display='inline'; persist(); };
+}
+
+// -------- Formular-Validierung vor PDF/Mail --------
+function validateBeforeSend() {
+  const errors = [];
+
+  // Grunddaten aus der Maske
+  const dt   = document.getElementById('inDate')?.value.trim() || '';
+  const drv  = document.getElementById('inOp')  ?.value.trim() || '';
+  const trk  = document.getElementById('inTr')  ?.value.trim() || '';
+  const tlr  = document.getElementById('inTl')  ?.value.trim() || '';
+
+  if (!dt)  errors.push('• Datum/Uhrzeit');
+  if (!drv) errors.push('• Fahrer/in');
+  if (!trk) errors.push('• Zugmaschine');
+  if (!tlr) errors.push('• Auflieger/Modul');
+
+  // Pflicht-Checkpunkte (items mit req === true)
+  const missingChecks = items
+    .filter(it => it.req)                        // nur Pflichtpunkte
+    .filter(it => {
+      const r = state.res[it.id];
+      return !r || !r.sev || r.sev === '-';      // noch nicht bewertet
+    })
+    .map(it => '  - ' + it.title);
+
+  if (missingChecks.length) {
+    errors.push('• Pflicht-Checkpunkte:\n' + missingChecks.join('\n'));
+  }
+
+  // Digitale Unterschrift
+  if (!state.sig) {
+    errors.push('• Digitale Unterschrift');
+  }
+
+  // Falls es Probleme gibt: Hinweis anzeigen und false zurückgeben
+  if (errors.length) {
+    alert(
+      'Bitte vor dem Erzeugen/Versand noch Folgendes erledigen:\n\n' +
+      errors.join('\n')
+    );
+    return false;
+  }
+
+  // alles okay
+  return true;
+}
+
+    
+// -------- PDF bauen (Zebra-Tabelle + großes weißes Signaturfeld) --------
+function buildPdf() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:'mm', format:'a4', compress:true });
+  // Standard-Schriftart und -größe für das ganze PDF
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);   // vorher war der Default größer
+    const dateField = document.getElementById('inDate');
+  const dtDisplay = dateField && dateField.value ? dateField.value : formatNowForDisplay();
+
+
+  const m = 14;
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  let y = m;
+
+  // Logo Seite 1
+  try {
+    const domLogo = document.getElementById('felberLogo');
+    if (domLogo && domLogo.complete) {
+      const LOGO_W=32, LOGO_H=12, Y_LOGO=6, X_LOGO=pageW - m - LOGO_W;
+      doc.addImage(domLogo,'PNG',X_LOGO,Y_LOGO,LOGO_W,LOGO_H);
+      y = Math.max(y, Y_LOGO + LOGO_H + 8);
+    }
+  } catch(_) {}
+
+  const line=(txt,bold=false)=>{ doc.setFont('helvetica', bold?'bold':'normal'); doc.text(String(txt||''), m, y); y+=6; };
+
+// Kopf
+doc.setFont('helvetica', 'bold');
+doc.setFontSize(12);                   // vorher 14 o.ä.
+line('Fahrzeugkontrolle – Schwerlast/Zugmaschine', true);
+
+doc.setFont('helvetica', 'normal');
+doc.setFontSize(9);                    // vorher 11
+line(`Datum/Uhrzeit: ${dtDisplay}`);
+
+line(`Fahrer/in: ${document.getElementById('inOp')?.value || ''}`);
+line(`Zugmaschine: ${document.getElementById('inTr')?.value || ''} | Auflieger/Modul: ${document.getElementById('inTl')?.value || ''}`);
+
+const locVal = document.getElementById('inLoc')?.value || '';
+if (locVal) line(`Ort: ${locVal}`);
+
+if (state.geo) line(`Geotag: ${state.geo.lat}, ${state.geo.lon} (±${state.geo.acc} m)`);
+
+y += 3;   // kleinerer Abstand nach unten (vorher 5–6)
+
+  
+ // Tabelle
+const colW = { status: 28, foto: 32, text: pageW - 2*m - 28 - 32 };
+const x    = { status: m, text: m + 28, foto: pageW - m - colW.foto };
+
+// Zebra + Zeilenhöhen + Reserve für Unterschrift
+const zebraA = [255,255,255];
+const zebraB = [248,250,252];
+
+// Zeilen kompakter:
+const rowMin = 8;      // statt 10
+const lineH  = 4;      // statt 4.5
+const padV   = 3;      // statt 5
+
+// etwas weniger Reserve für die Unterschrift
+const reserveForSignature = 50; // statt 70
+
+
+// Tabellenkopf
+doc.setDrawColor(200); 
+doc.setFillColor(245,245,245);
+doc.rect(m, y, pageW - 2*m, 6, 'F');   // Höhe 6 statt 8
+
+doc.setFontSize(9);                    // Kopf minimal kleiner
+doc.setFont('helvetica','bold');
+doc.text('Status',     x.status + 2, y + 4);  // tiefer, passend zu Höhe 6
+doc.text('Checkpoint', x.text   + 2, y + 4);
+doc.text('Foto',       x.foto   + 2, y + 4);
+
+y += 8;                                // statt 10
+
+
+// Zeilen
+let rowIndex = 0;
+items.forEach(it => {
+  const r = state.res[it.id] || {};
+  const status = r.sev || '-';   // <<< NEU: lokale Variable für den PDF-Status
+const sev = status;  // <<< Back-Compat: für alte sev-Verwendungen im PDF
+ const photos = Array.isArray(r.photos) ? r.photos : [];
+const fotos  = photos.length ? `ja (${photos.length})` : '-';
+ 
+
+// Beschreibung & Hinweistext
+const desc = (it.description || '').trim();   // unsere Prüfpunkte
+const note = (r.note || '').trim();           // Fahrer-Bemerkung
+
+// Basistext: Titel + Beschreibung
+const base = it.title + (desc ? `\n${desc}` : '');
+
+// kompletter Text inkl. Hinweis-Zeile (nur wenn note vom desc abweicht)
+const txt = base + (note && note !== desc ? `\nHinweis: ${note}` : '');
+
+// Text umbrechen wie gehabt
+doc.setFont('helvetica', 'normal');
+
+const wrapped = doc.splitTextToSize(txt, colW.text - 4);
+const rowH = Math.max(rowMin, padV + wrapped.length * lineH);
+
+
+  // Seitenumbruch: Platz für Unterschrift reservieren
+  if (y + rowH > pageH - m - reserveForSignature) {
+    doc.addPage();
+    y = m;
+
+    // Kopf auf neuer Seite erneut zeichnen
+    doc.setDrawColor(200); doc.setFillColor(245,245,245);
+    doc.rect(m, y, pageW - 2*m, 8, 'F');
+    doc.setFont('helvetica','bold');
+    doc.text('Status',    x.status + 2, y + 5);
+    doc.text('Checkpoint',x.text   + 2, y + 5);
+    doc.text('Foto',      x.foto   + 2, y + 5);
+    y += 10;
+  }
+
+  // Zebra-Hintergrund
+  const zeb = (rowIndex % 2 === 0) ? zebraA : zebraB;
+  doc.setFillColor(zeb[0], zeb[1], zeb[2]);
+  doc.rect(m, y, pageW - 2*m, rowH, 'F');
+
+// Zelltexte (leicht höher gesetzt für bessere Optik)
+doc.setTextColor(0, 0, 0);
+
+// Status und Foto ganz normal
+doc.setFont('helvetica', 'normal');
+doc.text(String(sev),   x.status + 2, y + 7);
+doc.text(String(fotos), x.foto   + 2, y + 7);
+
+
+
+
+// Checkpoint-Text: erste Zeile fett, Rest normal – Hinweiszeile orange + kleiner
+const textX = x.text + 2;
+let textY = y + 4;
+
+// wrapped kann String oder Array sein -> vereinheitlichen
+const lines = Array.isArray(wrapped)
+  ? wrapped
+  : String(wrapped).split('\n');
+
+// 1. Zeile (Titel) fett, immer schwarz
+if (lines.length > 0) {
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(0, 0, 0);
+  doc.text(lines[0], textX, textY);
+  textY += lineH;
+}
+
+// Restzeilen normal
+doc.setFont('helvetica', 'normal');
+
+const hintExtraGap  = 1.5;  // zusätzlicher Abstand UNTER der Hinweiszeile (mm)
+const hintTopShift  = 1;    // Hinweis minimal tiefer setzen
+
+for (let i = 1; i < lines.length; i++) {
+  const line  = String(lines[i]);
+  const isHint = /^Hinweis:/i.test(line.trim());
+
+  if (isHint) {
+    // Hinweis in Orange, etwas tiefer und mit Zusatzabstand nach unten
+    doc.setTextColor(255, 140, 0);
+    doc.text(line, textX, textY + hintTopShift);
+    textY += lineH + hintExtraGap;
+  } else {
+    // normale Zeilen wie gehabt
+    doc.setTextColor(0, 0, 0);
+    doc.text(line, textX, textY);
+    textY += lineH;
+  }
+}
+
+// sicherheitshalber wieder auf Schwarz
+doc.setTextColor(0, 0, 0);
+
+
+
+
+// danach geht es weiter wie gehabt:
+  y += rowH;
+  rowIndex += 1;
+});
+
+
+// Unterschrift
+y += 16; // mehr Abstand von der Tabelle zum Label
+
+// Hinweistext + Label für Unterschrift
+doc.setFont('helvetica', 'normal');
+doc.setFontSize(9);
+doc.text('Durch meine Unterschrift bestätige ich die Überprüfung sämtlicher Punkte.', m, y);
+y += 5; // etwas Abstand
+doc.setFont('helvetica', 'bold');
+doc.text('Digitale Unterschrift:', m, y);
+
+
+// kein zusätzliches y-Inkrement hinter dem Label!
+
+const sigBoxW = pageW - 2 * m;
+const sigBoxH = 32;
+const sigX = m;
+const sigY = y + 8;
+
+doc.setFillColor(255, 255, 255);
+doc.rect(sigX, sigY, sigBoxW, sigBoxH, 'F');
+
+if (state.sig) {
+  try {
+    const pad = 3;
+    const fmt = state.sig.startsWith('data:image/png') ? 'PNG' : 'JPEG';
+
+    // === Skalierung um 30 % kleiner (auf 70 % der Originalgröße) ===
+    const sigScale = 0.7;
+    const sigW = (sigBoxW - 2 * pad) * sigScale;
+    const sigH = (sigBoxH - 2 * pad) * sigScale;
+
+    // Zentrierung im ursprünglichen Feld:
+    const sigXadj = sigX + pad + ((sigBoxW - 2 * pad) - sigW) / 2;
+    const sigYadj = sigY + pad + ((sigBoxH - 2 * pad) - sigH) / 2;
+
+    // Bild einfügen
+    doc.addImage(state.sig, fmt, sigXadj, sigYadj, sigW, sigH);
+  } catch {
+    doc.setFont('helvetica', 'normal');
+    doc.text('(keine Signatur einbettbar)', m, sigY + 6);
+  }
+
+} else {
+  doc.setDrawColor(200);
+  doc.rect(sigX, sigY, sigBoxW, sigBoxH);
+  doc.setFont('helvetica', 'normal');
+  doc.text('(keine Signatur)', m, sigY + 6);
+}
+
+  y = sigY + sigBoxH + 6;
+// ===== Fotos je Checkpunkt als Folgeseiten anfügen =====
+const m2 = m;              // Außenrand weiterverwenden
+let y2 = m2;               // aktuelle Y-Position auf Fotoseiten
+let photoPageStarted = false;  // merken, ob wir schon auf einer Fotoseite sind
+
+items.forEach(it => {
+  const r = state.res[it.id] || {};
+  if (!r.photos || !r.photos.length) return;
+
+  // Erste Fotoseite nur EINMAL anlegen
+  if (!photoPageStarted) {
+    doc.addPage();
+    photoPageStarted = true;
+    y2 = m2;               // Start oben auf der erste Fotoseite
+  }
+
+// Überschrift für diesen Fotoblock
+// Falls die Überschrift am Seitenende landen würde: neue Seite
+const pageHeightForHeader = doc.internal.pageSize.getHeight();  // Höhe lokal ermitteln
+if (y2 + 10 > pageHeightForHeader - 20) {   // 20 mm Reserve nach unten
+  doc.addPage();
+  y2 = m2;
+}
+
+
+
+ 
+  // >>> ab hier kommt unverändert dein r.photos.forEach(...)-Block <<<
+
+ // ------------------------------------------------------
+// ------------------------------------------------------
+// Fotoblock-Überschrift mit intelligenter Seitenwahl
+// ------------------------------------------------------
+
+// Mindestplatz, den wir für Überschrift + mindestens ein Foto brauchen (in mm)
+const minSpaceForPhotoBlock = 90;   // ggf. später anpassen
+const footerReserve          = 15;  // Abstand zum Fußbereich
+
+// Seitenhöhe lokal ermitteln (kein pageH2 nötig)
+const pageHeightForPhotos = doc.internal.pageSize.getHeight();
+
+// Reicht der Platz auf der aktuellen Seite noch?
+if (y2 + minSpaceForPhotoBlock > pageHeightForPhotos - footerReserve) {
+  // Nein -> neue Seite anfangen
+  doc.addPage();
+  y2 = m2;                  // wieder an oberen Rand der neuen Seite
+} else {
+  // Ja -> nur kleinen Abstand zum vorherigen Block einfügen
+  y2 += 6;
+}
+
+// Überschrift für diesen Fotoblock
+doc.setFont('helvetica', 'bold');
+doc.text(`Fotos – ${it.title}`, m2, y2);
+y2 += 8;                     // etwas Luft unter der Überschrift
+
+  // Jede Aufnahme in moderater Größe einfügen
+  const pageW2 = doc.internal.pageSize.getWidth();
+  const pageH2 = doc.internal.pageSize.getHeight();
+  const maxW  = pageW2 - 2*m2;
+  const maxH  = 60; // Zielhöhe je Bild ~60 mm
+
+  r.photos.forEach(p=>{
+    try{
+      // Abmessungen robust ermitteln
+      let iw = 1200, ih = 900;
+      try{
+        const props = doc.getImageProperties(p);
+        iw = props?.width  || props?.w || iw;
+        ih = props?.height || props?.h || ih;
+      }catch(_){}
+
+      // Skaliert, ohne zu groß zu werden
+      let scale = Math.min(maxW/iw, maxH/ih);
+      scale *= 0.50; // kleine Drossel für Dateigröße
+      const w = Math.max(1, iw*scale);
+      const h = Math.max(1, ih*scale);
+
+      // Seitenumbruch falls nötig
+ // Seitenumbruch nur, wenn wirklich zu wenig Platz für das nächste Bild ist
+const bottomMargin = 10;      // unterer Rand in mm
+const topMarginAfterLogo = m2 + 50; // Abstand unterhalb des Logos/Kopfs
+
+if (y2 + h + bottomMargin > pageH2) {
+  doc.addPage();
+  y2 = topMarginAfterLogo;    // nicht ganz oben starten, sondern unterhalb des Logos
+}
+
+
+      const x2 = m2 + (maxW - w)/2;
+      doc.addImage(p, 'JPEG', x2, y2, w, h);
+      y2 += h + 4;
+    }catch(_){
+      doc.setFont('helvetica','normal');
+      doc.text('(Foto konnte nicht eingebettet werden)', m2, y2);
+      y2 += 6;
+    }
+  });
+});
+
+  // Logo auf Folgeseiten
+  try {
+    const domLogo = document.getElementById('felberLogo');
+    if (domLogo && domLogo.complete) {
+      const LOGO_W=28, LOGO_H=10.5, Y_LOGO=6, X_LOGO=pageW - m - LOGO_W;
+      for(let i=2;i<=doc.getNumberOfPages();i++){ doc.setPage(i); doc.addImage(domLogo,'PNG',X_LOGO,Y_LOGO,LOGO_W,LOGO_H); }
+    }
+  } catch(_) {}
+// ------------------------------------------------------
+// ------------------------------------------------------
+// ------------------------------------------------------
+// Fußzeile: Fahrer, Datum, Seitenzahl
+// ------------------------------------------------------
+try {
+  const pageCount = doc.getNumberOfPages();
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  const footerY = pageH - 8;          // etwas dichter an den Rand
+  const margin  = 10;
+
+  // Fahrername direkt aus Eingabefeld "inOp"
+  const driverField = document.getElementById('inOp');
+  const fahrer = driverField && driverField.value
+    ? driverField.value
+    : '(kein Fahrer)';
+
+  // Datum aus Feld "inDate" oder aktuelles Datum
+  const dateField = document.getElementById('inDate');
+  const datum = dateField && dateField.value
+    ? dateField.value
+    : new Date().toLocaleDateString('de-DE');
+
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8); // dezente Schrift für Fußzeile
+
+    // Links: Fahrer
+    doc.text(`Fahrer: ${fahrer}`, margin, footerY);
+
+    // Mitte: Datum
+    doc.text(`Datum: ${datum}`, pageW / 2, footerY, { align: 'center' });
+
+    // Rechts: Seitenzahl
+    doc.text(`Seite ${i} von ${pageCount}`, pageW - margin, footerY, { align: 'right' });
+  }
+} catch (e) {
+  console.warn('Fußzeile konnte nicht erzeugt werden:', e);
+}
+
+return doc.output('blob');
+}
+// -------- Utilities --------
+const blobToBase64 = blob => new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result.split(',')[1]); r.onerror=rej; r.readAsDataURL(blob); });
+
+  // -------- Validierung vor PDF/Mail --------
+function validateBeforeSend() {
+  const errors = [];
+
+  // Grunddaten
+  const dt   = document.getElementById('inDate')?.value.trim() || '';
+  const drv  = document.getElementById('inOp')  ?.value.trim() || '';
+  const trk  = document.getElementById('inTr')  ?.value.trim() || '';
+  const tlr  = document.getElementById('inTl')  ?.value.trim() || '';
+
+  if (!dt)  errors.push('• Datum/Uhrzeit');
+  if (!drv) errors.push('• Fahrer/in');
+  if (!trk) errors.push('• Zugmaschine');
+  if (!tlr) errors.push('• Auflieger/Modul');
+
+  // Pflicht-Checkpunkte (items mit req === true)
+  const missingChecks = items
+    .filter(it => it.req)
+    .filter(it => {
+      const r = state.res[it.id];
+      return !r || !r.sev || r.sev === '-';
+    })
+    .map(it => '  - ' + it.title);
+
+  if (missingChecks.length) {
+    errors.push('• Pflicht-Checkpunkte:\n' + missingChecks.join('\n'));
+  }
+
+  // Digitale Unterschrift
+  if (!state.sig) {
+    errors.push('• Digitale Unterschrift');
+  }
+
+  if (errors.length) {
+    alert(
+      'Bitte vor dem Erzeugen/Versand noch Folgendes erledigen:\n\n' +
+      errors.join('\n')
+    );
+    return false;
+  }
+
+  return true;
+}
+  
+
+// -------- Aktionen --------
+
+  function onPdf(){
+  // NEU: erst prüfen, ob alles ausgefüllt ist
+  if (!validateBeforeSend()) return;
+    
+  try{
+    const blob=buildPdf();
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download='Fahrzeugkontrolle.pdf'; a.click();
+    URL.revokeObjectURL(url);
+    const s=document.getElementById('status'); if(s) s.textContent='PDF gespeichert ('+(blob.size/1024/1024).toFixed(2)+' MB)';
+  }catch(err){ alert('PDF-Fehler: '+(err?.message||err)); }
+}
+async function onMail(){
+ // NEU: erst prüfen, ob alles ausgefüllt ist
+  if (!validateBeforeSend()) return; 
+  try{
+    const RELAY_URL = 'https://script.google.com/macros/s/AKfycbyl-Wui8XwQJq2lHZb_vaoc-ZCOGpGbn3v2GDd-t0WOj-3M_pADzxEKbvLTvwPKOkQq/exec';
+    const s = document.getElementById('status'); if (s) s.textContent = 'Erzeuge PDF …';
+
+ 
+    // Stammdaten
+    // --- Betreff & Dateiname neu aufbauen ---
+const dateField = document.getElementById('inDate');
+const dtMail = dateField && dateField.value
+  ? dateField.value
+  : formatNowForDisplay();   // Fallback, falls Feld leer
+
+const tr = document.getElementById('inTr')?.value || 'Zugmaschine';
+const tl = document.getElementById('inTl')?.value || 'Auflieger/Modul';
+const drv = document.getElementById('inOp')?.value || 'Fahrer/in';
+
+
+// Gesamtstatus automatisch ermitteln: Mangel > Hinweis > OK
+const overallSev = (() => {
+  let sev = 'OK';
+  for (const id in state.res) {
+    const res = state.res[id];
+    if (!res || !res.sev) continue;
+    if (res.sev === 'Mangel') return 'Mangel'; // höchste Priorität
+    if (res.sev === 'Hinweis' && sev === 'OK') sev = 'Hinweis';
+  }
+  return sev;
+})();
+
+// Freigabe automatisch aus Gesamtstatus ableiten
+const releaseText = (overallSev === 'Mangel') ? 'NICHT ERTEILT' : 'ERTEILT';
+    
+ // Versand komplett verhindern, wenn ein Mangel vorliegt
+if (overallSev === 'Mangel') {
+  alert('Es liegt mindestens ein MANGEL vor.\n' +
+        'Freigabe NICHT ERTEILT – E-Mail wird nicht versendet.');
+
+  const s = document.getElementById('status');
+  if (s) s.textContent = 'Freigabe NICHT ERTEILT – keine Mail versendet.';
+
+  return; // >>> hier brichst du onMail() ab, bevor irgendetwas verschickt wird
+}
+
+   
+
+// Neuer Betreff
+const subject =
+  `[Fahrzeugkontrolle] ${overallSev} – ${tr} / ${tl} – ${dtMail} – ${drv}`;
+
+// Dateiname aufräumen (keine Sonderzeichen)
+const safeDate = dtMail.replace(/[^\wäöüÄÖÜß]+/g, '_');
+const filename = `Fahrzeugkontrolle_${tr}_${tl}_${safeDate}.pdf`;
+
+// Body-Text für die E-Mail: Hauptgruppen + Status
+const lines = items.map(it => {
+  const r = state.res[it.id] || {};
+  const sev = r.sev || '-';
+  const status =
+    sev === 'Mangel'  ? 'Mangel'  :
+    sev === 'Hinweis' ? 'Hinweis' :
+    'OK';
+  return `${it.title}: ${status}`;
+});
+
+const body = lines.join('\n');   // <-- ab hier gibt es "body"
+    // Zusatzinfos für die HTML-Mail an GAS
+const driverName = document.getElementById('inOp')?.value  || '';
+const truck      = document.getElementById('inTr')?.value  || '';
+const trailer    = document.getElementById('inTl')?.value  || '';
+const location   = document.getElementById('inLoc')?.value || '';
+
+// Geo-Tag wie im PDF
+const geoTag = (state.geo && state.geo.lat && state.geo.lon)
+  ? `${state.geo.lat}, ${state.geo.lon} (±${state.geo.acc} m)`
+  : '';
+
+// Die Statuszeilen auch als Checkliste an GAS geben
+const checkItems = lines;
+
+// PDF erstellen
+    lastPdfDriver = driverName;             // <--- NEU: Fahrer für Fußzeile merken
+    const pdfBlob = buildPdf();
+    const base64  = await blobToBase64(pdfBlob);
+    // Empfänger
+    const to  = 'Dispo-Memmingen@felbermayr.cc';
+    const cc  = (document.getElementById('inCc') ?.value || '').trim();
+    const bcc = (document.getElementById('inBcc')?.value || '').trim();
+
+    // HTML aus Text (escapen)
+    const html = '<div>' + body
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\n/g,'<br>') + '</div>';
+
+ // Payload korrigiert: body statt bodyText
+const payload = {
+  to,
+  cc,
+  bcc,
+  subject,
+  text: body,      // bleibt wie gehabt
+  html,
+  filename,
+  pdfBase64: base64,
+
+  // NEU: Daten für das schöne HTML in GAS
+  driverName,
+  truck,
+  trailer,
+  location,
+  geoTag,
+  checkItems,
+  overallSev      // den hast du weiter oben schon berechnet
+};
+
+if (s) s.textContent = 'Sende E-Mail …';
+// --- Pflichtprüfung: Ort muss vorhanden sein ---
+if (!location || location.trim() === '') {
+  alert('Ort konnte nicht ermittelt werden.\nBitte GPS prüfen und erneut versuchen.');
+  const s = document.getElementById('status');
+  if (s) s.textContent = '';   // Statusmeldung zurücksetzen
+  return;                      // Versand abbrechen
+}
+// ------------------------------------------------
+
+try {
+  await fetch(RELAY_URL, {
+    method: 'POST',
+    mode: 'no-cors', // wichtig: keine CORS-Probleme, Antwort wird nicht ausgewertet
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload),
+  });
+
+  // Wenn kein Fehler geflogen ist, betrachten wir den Versand als angestoßen
+  if (s) s.textContent = 'Versand angestoßen.';
+
+} catch (err) {
+  console.error(err);
+  alert('Fehler beim Versand: ' + (err?.message || err));
+
+  const s = document.getElementById('status');
+  if (s) s.textContent = '';
+}
+
+
+
+  } catch (err){
+    console.error(err);
+    alert('Fehler beim Versand: ' + (err?.message || err));
+    const s = document.getElementById('status'); if (s) s.textContent = '';
+  }
+}
+
+
+// === CHECKLISTE + HILFSFUNKTIONEN ===
+function renderChecklist(){
+  const host = document.getElementById('checklist');
+  if (!host) return;
+  host.innerHTML = '';
+
+  const groups = [...new Set(items.map(i => i.sec))];
+  groups.forEach(sec=>{
+    host.insertAdjacentHTML('beforeend', `<div style="font-weight:700;margin:6px 0">${sec}</div>`);
+    items.filter(i=>i.sec===sec).forEach(it=>{
+      const card = document.createElement('div');
+      card.className = 'card';
+     card.innerHTML = `
+  <div class="row" style="justify-content:space-between">
+    <div class="row" style="gap:8px">
+      <div style="font-weight:600">${it.title}</div>${it.req ? '<span class="chip">Pflicht</span>' : ''}
+    </div>
+  </div>
+
+  <div class="checkpoints">${it.description || ''}</div>
+
+  <div class="row">
+    <button class="btn" data-sev="OK">OK</button>
+    <button class="btn" data-sev="Hinweis">Hinweis</button>
+    <button class="btn" data-sev="Mangel">Mangel</button>
+  </div>
+
+  <textarea class="autogrow" placeholder="Bemerkung / Maßnahmen…"></textarea>
+
+  <label style="display:block;margin-top:6px">
+    <span style="font-size:14px;font-weight:600">Foto hinzufügen</span>
+    <input type="file" accept="image/*" capture="environment" style="display:block;margin-top:6px">
+  </label>
+
+  <div class="photos" id="ph_${it.id}"></div>
+`;
+
+      host.appendChild(card);
+      // Prüfpunkte in das Bemerkungsfeld setzen (nur wenn noch nichts drinsteht)
+const taEl = card.querySelector('textarea');
+const res  = state.res[it.id] || (state.res[it.id] = { sev:'', note:'', photos:[] });
+
+taEl.classList.add('autogrow');
+const autosize = el => { el.style.height='auto'; el.style.height = el.scrollHeight + 'px'; };
+
+// Falls eine alte Note exakt der Prüfliste entspricht: leeren
+const descTrim  = (it.description || '').trim();
+let   noteTrim  = (res.note || '').trim();
+if (noteTrim && noteTrim === descTrim) {
+  res.note = '';
+  noteTrim = '';
+  try { localStorage.setItem(SKEY, JSON.stringify(state)); } catch {}
+}
+
+// Nur die echte, eigene Notiz laden
+taEl.value = noteTrim;
+autosize(taEl);
+
+taEl.addEventListener('input', (e) => {
+  res.note = e.target.value;
+  autosize(taEl);
+  try { localStorage.setItem(SKEY, JSON.stringify(state)); } catch {}
+});
+
+
+
+
+      if (!state.res[it.id]) state.res[it.id] = { sev:'', note:'', photos:[] };
+
+      // Status-Buttons
+      const btns = card.querySelectorAll('button[data-sev]');
+      const mark = v=>{
+        btns.forEach(b=>b.className='btn');
+        btns.forEach(b=>{
+          if (b.dataset.sev===v) b.className += ' ' + (v==='OK'?'ok':v==='Hinweis'?'warn':'bad') + ' active';
+        });
+      };
+      if (state.res[it.id].sev) mark(state.res[it.id].sev);
+      btns.forEach(b=>{
+        b.onclick = ()=>{ state.res[it.id].sev=b.dataset.sev; mark(b.dataset.sev); localStorage.setItem(SKEY, JSON.stringify(state)); };
+      });
+
+   
+     
+      // Foto
+      const fi = card.querySelector('input[type=file]');
+      fi.onchange = async e=>{
+        const f = e.target.files && e.target.files[0]; if(!f) return;
+        const url = await compressImageFile(f, 700, 0.42);
+        state.res[it.id].photos.push(url);
+        redrawPhotos(it.id);
+        localStorage.setItem(SKEY, JSON.stringify(state));
+        fi.value = '';
+      };
+
+      redrawPhotos(it.id);
+    });
+  });
+}
+// === RESET-FUNKTION ==================================
+function resetChecklist() {
+  // 1. Checkboxen und Radiobuttons zurücksetzen
+  document
+    .querySelectorAll('input[type="checkbox"], input[type="radio"]')
+    .forEach(el => { el.checked = false; });
+
+  // 2. Texteingaben & Textareas leeren – aber Fahrername behalten
+  document
+    .querySelectorAll('input[type="text"], textarea')
+    .forEach(el => {
+      if (el.id === 'inOp') return; // Fahrername behalten
+      el.value = '';
+    });
+
+  // 3. Fotos löschen (DOM + Speicher)
+  document.querySelectorAll('[id^="ph_"]').forEach(div => {
+    div.innerHTML = '';
+  });
+
+  
+
+  // 5. localStorage aufräumen – aber Fahrername behalten
+  Object.keys(localStorage).forEach(key => {
+    if (key !== 'driverName') {
+      localStorage.removeItem(key);
+    }
+  });
+
+  // 6. Interne Zustände zurücksetzen (auch Fotos!)
+  if (window.state) {
+    if (state.res) state.res = {};
+    if (state.photos) state.photos = {};
+  }
+
+  // 7. Checkliste neu aufbauen
+  renderChecklist();
+
+  console.log('Checkliste und Fotos zurückgesetzt – Fahrername bleibt gespeichert.');
+}
+// =====================================================
+
+function redrawPhotos(id){
+  const bar = document.getElementById('ph_'+id);
+  if (!bar) return;
+  bar.innerHTML = '';
+  (state.res[id].photos||[]).forEach((p,idx)=>{
+    const d = document.createElement('div'); d.className='ph';
+    d.innerHTML = `<img src="${p}"><button class="x" title="Entfernen">×</button>`;
+    d.querySelector('.x').onclick = ()=>{
+      state.res[id].photos.splice(idx,1);
+      localStorage.setItem(SKEY, JSON.stringify(state));
+      redrawPhotos(id);
+    };
+    bar.appendChild(d);
+  });
+}
+
+// Bilder komprimieren
+function compressImageFile(file,maxDim=700,quality=0.42){
+  return new Promise((resolve,reject)=>{
+    const r=new FileReader();
+    r.onload=()=>{ const img=new Image(); img.onload=()=>{
+      const c=document.createElement('canvas');
+      let w=img.width,h=img.height; const s=Math.min(1,maxDim/Math.max(w,h));
+      w=Math.round(w*s); h=Math.round(h*s); c.width=w; c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      resolve(c.toDataURL('image/jpeg',quality));
+    }; img.src=r.result; }; r.onerror=reject; r.readAsDataURL(file);
+  });
+}
+function probeImage(dataUrl){ return new Promise(res=>{ const i=new Image(); i.onload=()=>res({w:i.width,h:i.height}); i.src=dataUrl; }); }
+
+// === SIGNATUR ===
+function initSignature(){
+  const c = document.getElementById('sig');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+
+  function size(){
+    const w=c.clientWidth,h=170,px=window.devicePixelRatio||1;
+    c.style.width=w+'px'; c.style.height=h+'px';
+    c.width=Math.round(w*px); c.height=Math.round(h*px);
+    ctx.setTransform(px,0,0,px,0,0);
+    ctx.lineWidth=2; ctx.lineCap='round'; ctx.strokeStyle='#111827';
+  }
+  size(); window.addEventListener('resize', size);
+
+  let down=false,last=null;
+  const P=e=>{const r=c.getBoundingClientRect(); return {x:e.clientX-r.left,y:e.clientY-r.top};};
+  c.addEventListener('pointerdown',e=>{down=true; last=P(e);});
+  c.addEventListener('pointerup',   ()=>{down=false; last=null;});
+  c.addEventListener('pointerleave',()=>{down=false; last=null;});
+  c.addEventListener('pointermove', e=>{ if(!down) return; const p=P(e); ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(p.x,p.y); ctx.stroke(); last=p; });
+
+  const save=document.getElementById('btnSaveSig');
+  const clr =document.getElementById('btnClearSig');
+  if (clr)  clr.onclick  = ()=>{ ctx.clearRect(0,0,c.width,c.height); state.sig=''; document.getElementById('sigStatus').style.display='none'; localStorage.setItem(SKEY, JSON.stringify(state)); };
+  if (save) save.onclick = ()=>{ state.sig=c.toDataURL('image/png'); document.getElementById('sigStatus').style.display='inline'; localStorage.setItem(SKEY, JSON.stringify(state)); };
+}
+// --- GPS-Ortung + Reverse-Geocoding (für #btnGeo) ---
+async function onGeo(){
+  if (!navigator.geolocation) { alert('Kein GPS verfügbar.'); return; }
+
+  navigator.geolocation.getCurrentPosition(async pos => {
+    // Werte in Ihren globalen Zustand schreiben
+    state.geo = {
+      lat: +pos.coords.latitude.toFixed(6),
+      lon: +pos.coords.longitude.toFixed(6),
+      acc: Math.round(pos.coords.accuracy)
+    };
+
+    // Ausgabe unter "Fahrzeugdaten"
+    const out = document.getElementById('geoOut');
+    if (out) out.textContent = `${state.geo.lat}, ${state.geo.lon} (±${state.geo.acc} m)`;
+
+    // Ortsname via Nominatim (best effort)
+    try {
+      const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${state.geo.lat}&lon=${state.geo.lon}&zoom=10&addressdetails=1`;
+      const r = await fetch(url, { headers: { 'Accept':'application/json' } });
+      const d = await r.json(); const a = d.address || {};
+      const place = a.city || a.town || a.village || a.municipality || a.county || '';
+      if (place) {
+        const inLoc = document.getElementById('inLoc');
+        if (inLoc) inLoc.value = place;
+        state.inLoc = place;
+        localStorage.setItem(SKEY, JSON.stringify(state));
+      }
+    } catch(_) { /* egal – Koordinaten stehen ja schon */ }
+  }, err => {
+    alert('GPS fehlgeschlagen: ' + (err?.message || err));
+  });
+}
+// --- GLOBAL: GPS-Ortung + Reverse-Geocoding ---
+window.onGeo = async function onGeo(){
+  if (!navigator.geolocation) { alert('Kein GPS verfügbar.'); return; }
+
+  navigator.geolocation.getCurrentPosition(async pos => {
+    state.geo = {
+      lat: +pos.coords.latitude.toFixed(6),
+      lon: +pos.coords.longitude.toFixed(6),
+      acc: Math.round(pos.coords.accuracy)
+    };
+
+    const out = document.getElementById('geoOut');
+    if (out) out.textContent = `${state.geo.lat}, ${state.geo.lon} (±${state.geo.acc} m)`;
+
+    try {
+      const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${state.geo.lat}&lon=${state.geo.lon}&zoom=10&addressdetails=1`;
+      const r = await fetch(url, { headers:{ 'Accept':'application/json' } });
+      const d = await r.json(); const a = d.address || {};
+      const place = a.city || a.town || a.village || a.municipality || a.county || '';
+      if (place) {
+        const inLoc = document.getElementById('inLoc');
+        if (inLoc) inLoc.value = place;
+        state.inLoc = place;
+        localStorage.setItem(SKEY, JSON.stringify(state));
+      }
+    } catch(_) {}
+  }, err => alert('GPS fehlgeschlagen: ' + (err?.message || err)));
+};
+
+// --- GLOBAL: Logo auswählen/komprimieren ---
+window.onLogoPick = async function onLogoPick(e){
+  const f = e.target.files && e.target.files[0];
+  if (!f) return;
+  const data = await compressImageFile(f, 320, 0.8);     // nutzt deine vorhandene Helper
+  const info = await probeImage(data);                    // nutzt deine vorhandene Helper
+  state.logo = data;
+  state.logoAspect = info.w / info.h || 1;
+  const li = document.getElementById('logoInfo');
+  if (li) li.textContent = `Logo gespeichert (${info.w}×${info.h})`;
+  localStorage.setItem(SKEY, JSON.stringify(state));
+};
+
+// -------- Init --------
+window.addEventListener('DOMContentLoaded', ()=>{
+  // Buttons
+  document.getElementById('btnPdf') ?.addEventListener('click', onPdf);
+  document.getElementById('btnMail')?.addEventListener('click', onMail);
+  // Reset-Button: Checkliste löschen
+const btnReset = document.getElementById('btnReset');
+if (btnReset) {
+    btnReset.addEventListener('click', () => {
+        const ok = confirm(
+            'Sollen alle Einträge der Checkliste (Status, Hinweise, Fotos) wirklich gelöscht werden?\n' +
+            'Fahrername und digitale Unterschrift bleiben erhalten.'
+        );
+        if (!ok) return;
+
+        try {
+            // nur den Checklisten-State löschen
+            localStorage.removeItem(SKEY);
+        } catch (e) {
+            console.warn('Konnte lokalen Checklisten-Status nicht löschen:', e);
+        }
+
+        // Seite neu laden
+        location.reload();
+    });
+}
+
+const btnGeo  = document.getElementById('btnGeo');
+if (btnGeo && typeof window.onGeo === 'function') {
+  btnGeo.addEventListener('click', window.onGeo);
+}
+
+const inLogo = document.getElementById('inLogo');
+if (inLogo && typeof window.onLogoPick === 'function') {
+  inLogo.addEventListener('change', window.onLogoPick);
+}
+
+  // Pflicht: Checkliste zeichnen
+  renderChecklist();
+  // Nach dem Zeichnen der Checkliste: Unterpunkte ergänzen
+setTimeout(() => {
+  const mapById = Object.fromEntries(items.map(it => [it.id, it]));
+  document.querySelectorAll('.item-desc').forEach(el => {
+    const id = el.dataset.id;
+    el.textContent = mapById[id]?.description || '';
+  });
+  console.log('[INFO] Unterpunkte ergänzt');
+}, 500);
+
+// Pflicht: Signatur aktivieren
+initSignature();
+
+// Fahrername merken & beim Start automatisch einfügen
+const driverField = document.getElementById('inOp');
+if (driverField) {
+  let savedDriver = localStorage.getItem('driverName');
+
+  // alten Zeitstempel-Müll ignorieren (z.B. 2025-11-04T07:30)
+  if (savedDriver && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(savedDriver)) {
+    console.warn('[INIT] driverName im localStorage war ein Datum, wird verworfen:', savedDriver);
+    localStorage.removeItem('driverName');
+    savedDriver = null;
+  }
+
+  if (savedDriver) {
+    driverField.value = savedDriver;
+  }
+
+  driverField.addEventListener('input', e => {
+    localStorage.setItem('driverName', e.target.value.trim());
+  });
+
+  console.log('[INIT] Fahrerfeld gefunden:', driverField);
+} else {
+  console.warn('[INIT] Kein Fahrer-Eingabefeld mit ID "inOp" gefunden!');
+}
+
+
+// Datum + Uhrzeit bei jedem Start auf "jetzt" setzen
+const dateField = document.getElementById('inDate');
+if (dateField) {
+  dateField.value = formatNowForDisplay();
+  console.log('[INIT] Datum/Uhrzeit gesetzt auf:', dateField.value);
+}
+
+  
+
+ 
+  
+
+});   // Ende DOMContentLoaded
+
+})(); // Ende IIFE
+
+  
+
+
+</script>
+<!-- Optionaler PDF-Hook (leer) -->
+<script>
+  window.patchPdf = function (doc, m, y) {
+    try { /* reserviert */ } catch (e) { console.warn('patchPdf warn:', e); }
+  };
+</script>
+
+</body>
+</html>
