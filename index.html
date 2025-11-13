@@ -325,175 +325,79 @@ function formatNowForDisplay() {
 
 // NEU: 5 Hauptgruppen (alten items-Array komplett ersetzen)
 const items = [
-  // --- DOKUMENTATION / AUFTRAG ---
   {
-    id: "docs_auftrag_gesamt",
+    id: "auftrag_ok",
     title: "Auftrag & Unterlagen geklärt",
     description:
-      "Folgendes prüfen:\n" +
-      "- Einsatzort und Aufgabe verstanden\n" +
-      "- Last, Radius und Hubhöhe klar\n" +
-      "- Einweiser/Signalgeber festgelegt\n" +
-      "- Kranpapiere und UVV-Prüfung gültig",
+      "Einsatzort, Aufgabe, Last, Radius, Einweiser geklärt. UVV gültig.",
     category: "Dokumentation",
     req: true
   },
 
-  // --- FAHRZEUG (Kurzfassung) ---
   {
-    id: "fahrzeug_rundgang",
-    title: "Rundgang Fahrzeug",
+    id: "fahrzeug_ok",
+    title: "Fahrzeug Rundgang OK",
     description:
-      "Schau rundum:\n" +
-      "- keine sichtbaren Schäden\n" +
-      "- keine Öl- oder Hydraulikflecken\n" +
-      "- nichts lose oder stark verbogen",
-    category: "Fahrzeug",
-    req: true
-  },
-  {
-    id: "fahrzeug_reifen_bremse",
-    title: "Reifen, Bremsen, Lenkung",
-    description:
-      "Prüfe:\n" +
-      "- Reifen ohne Risse/Beulen, Radmuttern unauffällig\n" +
-      "- Bremsen kurz getestet\n" +
-      "- Lenkung ohne ungewöhnliche Geräusche",
-    category: "Fahrzeug",
-    req: true
-  },
-  {
-    id: "fahrzeug_sicht_betriebsstoffe",
-    title: "Sicht & Betriebsstoffe",
-    description:
-      "Prüfe:\n" +
-      "- Scheiben und Spiegel sauber, ohne große Schäden\n" +
-      "- Kraftstoff ausreichend\n" +
-      "- Öl- und Kühlmittelstand plausibel\n" +
-      "- Scheibenwaschflüssigkeit vorhanden",
+      "Keine sichtbaren Schäden. Keine Leckagen. Reifen, Bremsen, Lenkung unauffällig.",
     category: "Fahrzeug",
     req: true
   },
 
-  // --- KRAN (Kurzfassung) ---
   {
-    id: "kran_abstuetzung_gesamt",
-    title: "Abstützung komplett in Ordnung",
+    id: "stuetzen_ok",
+    title: "Stützen / Abstützung OK",
     description:
-      "Vor dem Einsatz prüfen:\n" +
-      "- Stützen und Zylinder ohne sichtbare Schäden/Leckagen\n" +
-      "- Stützteller vorhanden und richtig unterlegt\n" +
-      "- kurze Funktionsprobe: Stützen fahren ruhig aus/ein",
-    category: "Kran",
-    req: true
-  },
-  {
-    id: "kran_ausleger_gesamt",
-    title: "Ausleger / Teleskop",
-    description:
-      "Prüfe:\n" +
-      "- keine Risse oder starke Dellen an den Segmenten\n" +
-      "- Bolzen/Sicherungen vollständig\n" +
-      "- kurze Teleskop-Funktionsprobe ohne Ruckeln",
-    category: "Kran",
-    req: true
-  },
-  {
-    id: "kran_seile_haken",
-    title: "Kranseile & Hakenflasche",
-    description:
-      "Sehr wichtig:\n" +
-      "- Seile ohne Drahtbrüche, Knicke oder starke Korrosion\n" +
-      "- Seilwicklung sauber auf der Trommel\n" +
-      "- Hakenflasche mit intakter Sicherheitslasche\n" +
-      "- Tragfähigkeitsschild lesbar",
-    category: "Kran",
-    req: true
-  },
-  {
-    id: "kran_anschlagmittel_gesamt",
-    title: "Anschlagmittel",
-    description:
-      "Prüfe:\n" +
-      "- Gurte, Ketten, Schäkel ohne sichtbare Schäden\n" +
-      "- keine Schnitte, Risse oder starke Verformungen\n" +
-      "- Kennzeichnungen/Zulassung lesbar, falls vorhanden",
+      "Stützen, Zylinder, Teller ohne Schäden. Kurze Funktionsprobe.",
     category: "Kran",
     req: true
   },
 
-  // --- STEUERUNG / SICHERHEITSSYSTEME ---
   {
-    id: "steuerung_lmi",
-    title: "Kransteuerung / Lastmomentbegrenzer",
+    id: "ausleger_ok",
+    title: "Ausleger / Teleskop OK",
     description:
-      "Beim Einschalten prüfen:\n" +
-      "- System startet ohne Fehlermeldung\n" +
-      "- Anzeigen plausibel\n" +
-      "- Lastmomentbegrenzer aktiv",
-    category: "Sicherheit / Funktion",
-    req: true
-  },
-  {
-    id: "steuerung_beleuchtung_rueckfahr",
-    title: "Licht & Rückfahrhilfe",
-    description:
-      "Prüfe:\n" +
-      "- Fahr- und Arbeitsbeleuchtung\n" +
-      "- Rundumkennleuchte\n" +
-      "- Rückfahrkamera/Sensoren soweit vorhanden",
-    category: "Sicherheit / Funktion",
-    req: true
-  },
-  {
-    id: "steuerung_notaus_funk",
-    title: "Not-Aus, Horn, Funksteuerung",
-    description:
-      "Kurz testen:\n" +
-      "- Not-Aus funktioniert\n" +
-      "- Horn/Warnsummer vorhanden und funktionsfähig\n" +
-      "- Funksteuerung (falls vorhanden) mit Testhub geprüft",
-    category: "Sicherheit / Funktion",
+      "Keine Risse/Dellen. Bolzen gesichert. Kurze Teleskopprobe.",
+    category: "Kran",
     req: true
   },
 
-  // --- FUNKTIONSPRÜFUNG ---
   {
-    id: "funktion_fahren_drehwerk",
-    title: "Fahr- und Drehfunktion",
+    id: "seil_haken_ok",
+    title: "Kranseil & Hakenflasche OK",
     description:
-      "Kurz prüfen:\n" +
-      "- Anfahren und Bremsen ohne Auffälligkeiten\n" +
-      "- Drehwerk läuft ruhig, ohne ungewöhnliche Geräusche",
-    category: "Sicherheit / Funktion",
-    req: true
-  },
-  {
-    id: "funktion_winde_lastprobe",
-    title: "Winde / Heben mit kleiner Last",
-    description:
-      "Vor dem eigentlichen Hub:\n" +
-      "- kurzer Probehub mit kleiner Last\n" +
-      "- Winde läuft gleichmäßig\n" +
-      "- keine Stör- oder Fehlermeldungen",
-    category: "Sicherheit / Funktion",
+      "Seile ohne Drahtbruch/Knick. Hakenlasche intakt.",
+    category: "Kran",
     req: true
   },
 
-  // --- UMWELT & AUFSTELLUNG ---
   {
-    id: "umwelt_untergrund_freiraum",
-    title: "Untergrund & Freiräume",
+    id: "steuerung_ok",
+    title: "Steuerung fehlerfrei",
     description:
-      "Prüfe am Einsatzort:\n" +
-      "- Untergrund tragfähig, keine Kanaldeckel unter Stützen\n" +
-      "- ausreichend Abstand zu Gräben/Kanten\n" +
-      "- keine Hindernisse im Schwenkbereich des Krans\n" +
-      "- Abstand zu Freileitungen eingehalten",
-    category: "Umwelt / Umfeld",
+      "LMI/LICCON ohne Fehler. Anzeigen plausibel. Not-Aus funktioniert.",
+    category: "Sicherheit",
+    req: true
+  },
+
+  {
+    id: "licht_rueckfahrt_ok",
+    title: "Licht & Rückfahrhilfe OK",
+    description:
+      "Fahr-/Arbeitslicht OK. Rundumleuchte OK. Kamera/Sensoren OK.",
+    category: "Sicherheit",
+    req: true
+  },
+
+  {
+    id: "umfeld_ok",
+    title: "Untergrund & Umgebung OK",
+    description:
+      "Untergrund tragfähig. Freiräume OK. Abstand zu Stromleitungen.",
+    category: "Umwelt",
     req: true
   }
 ];
+
 
 
 // Schritt C – Beschreibungen in Platzhalter schreiben
