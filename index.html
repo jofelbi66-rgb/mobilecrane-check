@@ -325,321 +325,176 @@ function formatNowForDisplay() {
 
 // NEU: 5 Hauptgruppen (alten items-Array komplett ersetzen)
 const items = [
+  // --- DOKUMENTATION / AUFTRAG ---
   {
-    id: "docs_auftrag",
-    title: "Arbeitsauftrag & Einsatzbesprechung",
+    id: "docs_auftrag_gesamt",
+    title: "Auftrag & Unterlagen geklärt",
     description:
       "Folgendes prüfen:\n" +
-      "- Einsatzort und Auftrag verstanden\n" +
-      "- Last, Radius, Hubhöhe klar\n" +
-      "- Einweiser/Signalgeber benannt\n" +
-      "- Kommunikation geklärt (Handzeichen/Funk)",
-    category: "Dokumentation"
+      "- Einsatzort und Aufgabe verstanden\n" +
+      "- Last, Radius und Hubhöhe klar\n" +
+      "- Einweiser/Signalgeber festgelegt\n" +
+      "- Kranpapiere und UVV-Prüfung gültig",
+    category: "Dokumentation",
+    req: true
   },
 
+  // --- FAHRZEUG (Kurzfassung) ---
   {
-    id: "docs_kranpapiere",
-    title: "Kranpapiere & UVV",
-    description:
-      "Prüfe:\n" +
-      "- Kranfahrerausweis vorhanden\n" +
-      "- UVV-Prüfung gültig\n" +
-      "- Geräteunterlagen dabei (digital oder Papier)",
-    category: "Dokumentation"
-  },
-
-  {
-    id: "fahrzeug_reifen",
-    title: "Reifen & Radmuttern",
-    description:
-      "Prüfe:\n" +
-      "- Reifen ohne Risse oder Schäden\n" +
-      "- Reifendruck plausibel\n" +
-      "- Radmuttern visuell kontrolliert",
-    category: "Fahrzeug"
-  },
-
-  {
-    id: "fahrzeug_leckagen",
-    title: "Sichtprüfung Fahrzeug",
+    id: "fahrzeug_rundgang",
+    title: "Rundgang Fahrzeug",
     description:
       "Schau rundum:\n" +
-      "- keine Ölflecken oder Tropfen\n" +
-      "- nichts lose, nichts beschädigt",
-    category: "Fahrzeug"
+      "- keine sichtbaren Schäden\n" +
+      "- keine Öl- oder Hydraulikflecken\n" +
+      "- nichts lose oder stark verbogen",
+    category: "Fahrzeug",
+    req: true
   },
-
   {
-    id: "fahrzeug_fahrwerk",
-    title: "Fahrwerk & Lenkung",
+    id: "fahrzeug_reifen_bremse",
+    title: "Reifen, Bremsen, Lenkung",
     description:
       "Prüfe:\n" +
-      "- Lenkung leichtgängig\n" +
-      "- keine ungewöhnlichen Geräusche beim Fahren\n" +
-      "- Bremsen kurz getestet",
-    category: "Fahrzeug"
+      "- Reifen ohne Risse/Beulen, Radmuttern unauffällig\n" +
+      "- Bremsen kurz getestet\n" +
+      "- Lenkung ohne ungewöhnliche Geräusche",
+    category: "Fahrzeug",
+    req: true
   },
-
   {
-    id: "fahrzeug_sicht",
-    title: "Scheiben & Spiegel",
+    id: "fahrzeug_sicht_betriebsstoffe",
+    title: "Sicht & Betriebsstoffe",
     description:
       "Prüfe:\n" +
-      "- Scheiben sauber und ohne Risse\n" +
-      "- Spiegel nicht beschädigt und richtig eingestellt",
-    category: "Fahrzeug"
+      "- Scheiben und Spiegel sauber, ohne große Schäden\n" +
+      "- Kraftstoff ausreichend\n" +
+      "- Öl- und Kühlmittelstand plausibel\n" +
+      "- Scheibenwaschflüssigkeit vorhanden",
+    category: "Fahrzeug",
+    req: true
   },
 
+  // --- KRAN (Kurzfassung) ---
   {
-    id: "fahrzeug_betriebsstoffe",
-    title: "Betriebsstoffe",
+    id: "kran_abstuetzung_gesamt",
+    title: "Abstützung komplett in Ordnung",
     description:
-      "Folgendes checken:\n" +
-      "- Kraftstoffstand ausreichend\n" +
-      "- Kühlmittel OK\n" +
-      "- Ölstand OK\n" +
-      "- AdBlue (falls erforderlich)\n" +
-      "- Scheibenwaschflüssigkeit",
-    category: "Fahrzeug"
+      "Vor dem Einsatz prüfen:\n" +
+      "- Stützen und Zylinder ohne sichtbare Schäden/Leckagen\n" +
+      "- Stützteller vorhanden und richtig unterlegt\n" +
+      "- kurze Funktionsprobe: Stützen fahren ruhig aus/ein",
+    category: "Kran",
+    req: true
   },
-
   {
-    id: "kran_stuetzen",
-    title: "Stützen & Stützteller",
-    description:
-      "Prüfe vor dem Ausfahren:\n" +
-      "- Stützen unbeschädigt\n" +
-      "- keine Leckagen an Zylindern\n" +
-      "- Stützteller vorhanden und richtig positioniert",
-    category: "Kran"
-  },
-
-  {
-    id: "kran_abstuetzen_test",
-    title: "Funktionstest Abstützung",
-    description:
-      "Kurz prüfen:\n" +
-      "- Stützen fahren gleichmäßig aus/ein\n" +
-      "- kein ungewöhnliches Geräusch\n" +
-      "- Neigungssensor ohne Fehlermeldung",
-    category: "Kran"
-  },
-
-  {
-    id: "kran_ausleger_sicht",
-    title: "Ausleger – Sichtprüfung",
+    id: "kran_ausleger_gesamt",
+    title: "Ausleger / Teleskop",
     description:
       "Prüfe:\n" +
-      "- keine Risse oder Dellen an den Segmenten\n" +
-      "- keine lose Bolzen oder Sicherungen\n" +
-      "- Ausleger sauber",
-    category: "Kran"
+      "- keine Risse oder starke Dellen an den Segmenten\n" +
+      "- Bolzen/Sicherungen vollständig\n" +
+      "- kurze Teleskop-Funktionsprobe ohne Ruckeln",
+    category: "Kran",
+    req: true
   },
-
   {
-    id: "kran_ausleger_funktion",
-    title: "Teleskop-Funktionstest",
+    id: "kran_seile_haken",
+    title: "Kranseile & Hakenflasche",
     description:
-      "Kurz testen:\n" +
-      "- Ausleger fährt sauber aus\n" +
-      "- kein Ruckeln oder Blockieren",
-    category: "Kran"
+      "Sehr wichtig:\n" +
+      "- Seile ohne Drahtbrüche, Knicke oder starke Korrosion\n" +
+      "- Seilwicklung sauber auf der Trommel\n" +
+      "- Hakenflasche mit intakter Sicherheitslasche\n" +
+      "- Tragfähigkeitsschild lesbar",
+    category: "Kran",
+    req: true
   },
-
   {
-    id: "kran_windmessung",
-    title: "Windmessgerät",
-    description:
-      "Prüfe:\n" +
-      "- Windmessgerät vorhanden\n" +
-      "- Anzeige plausibel\n" +
-      "- keine Fehlermeldung",
-    category: "Kran"
-  },
-
-  {
-    id: "kran_drehwerk",
-    title: "Drehwerk",
-    description:
-      "Prüfe:\n" +
-      "- Drehwerk läuft ruhig\n" +
-      "- keine ungewöhnlichen Geräusche\n" +
-      "- kein Spiel",
-    category: "Kran"
-  },
-
-  {
-    id: "kran_seile",
-    title: "Kranseile",
-    description:
-      "Sehr wichtig – prüfen:\n" +
-      "- keine Drahtbrüche\n" +
-      "- keine Knicke\n" +
-      "- keine Korrosion\n" +
-      "- Seilwicklung sauber",
-    category: "Kran"
-  },
-
-  {
-    id: "kran_hakenflasche",
-    title: "Hakenflasche",
-    description:
-      "Prüfe:\n" +
-      "- Sicherheitslasche OK\n" +
-      "- Tragfähigkeitsschild lesbar\n" +
-      "- Haken frei beweglich",
-    category: "Kran"
-  },
-
-  {
-    id: "kran_anschlagmittel",
+    id: "kran_anschlagmittel_gesamt",
     title: "Anschlagmittel",
     description:
       "Prüfe:\n" +
-      "- Gurte/Ketten/Schäkel intakt\n" +
-      "- keine Beschädigungen\n" +
-      "- Kennzeichnungen lesbar",
-    category: "Kran"
+      "- Gurte, Ketten, Schäkel ohne sichtbare Schäden\n" +
+      "- keine Schnitte, Risse oder starke Verformungen\n" +
+      "- Kennzeichnungen/Zulassung lesbar, falls vorhanden",
+    category: "Kran",
+    req: true
   },
 
+  // --- STEUERUNG / SICHERHEITSSYSTEME ---
   {
-    id: "kran_hydraulik_sicht",
-    title: "Hydraulik",
+    id: "steuerung_lmi",
+    title: "Kransteuerung / Lastmomentbegrenzer",
     description:
-      "Prüfe:\n" +
-      "- keine Leckagen\n" +
-      "- Schläuche ohne Scheuerstellen\n" +
-      "- Druckleitungen OK",
-    category: "Kran"
-  },
-
-  {
-    id: "elektrik_steuerung",
-    title: "Kransteuerung (LMI/LICCON)",
-    description:
-      "Beim Start prüfen:\n" +
-      "- System meldet keine Fehler\n" +
+      "Beim Einschalten prüfen:\n" +
+      "- System startet ohne Fehlermeldung\n" +
       "- Anzeigen plausibel\n" +
       "- Lastmomentbegrenzer aktiv",
-    category: "Sicherheit"
+    category: "Sicherheit / Funktion",
+    req: true
   },
-
   {
-    id: "elektrik_beleuchtung",
-    title: "Fahr- & Arbeitsbeleuchtung",
+    id: "steuerung_beleuchtung_rueckfahr",
+    title: "Licht & Rückfahrhilfe",
     description:
       "Prüfe:\n" +
-      "- Licht vorne/hinten\n" +
-      "- Rundumleuchte\n" +
-      "- Arbeitsscheinwerfer",
-    category: "Sicherheit"
+      "- Fahr- und Arbeitsbeleuchtung\n" +
+      "- Rundumkennleuchte\n" +
+      "- Rückfahrkamera/Sensoren soweit vorhanden",
+    category: "Sicherheit / Funktion",
+    req: true
   },
-
   {
-    id: "elektrik_warnsummer",
-    title: "Warnsummer & Horn",
-    description:
-      "Prüfe:\n" +
-      "- Warnsummer aktiv\n" +
-      "- Horn funktioniert",
-    category: "Sicherheit"
-  },
-
-  {
-    id: "elektrik_rueckfahrkamera",
-    title: "Rückfahrkamera / Sensoren",
-    description:
-      "Prüfe:\n" +
-      "- Kamera sauber\n" +
-      "- Anzeige OK\n" +
-      "- Sensoren reagieren",
-    category: "Sicherheit"
-  },
-
-  {
-    id: "sicherheit_notaus",
-    title: "Not-Aus",
+    id: "steuerung_notaus_funk",
+    title: "Not-Aus, Horn, Funksteuerung",
     description:
       "Kurz testen:\n" +
-      "- Not-Aus spricht an\n" +
-      "- Funktion ohne Störung",
-    category: "Sicherheit"
+      "- Not-Aus funktioniert\n" +
+      "- Horn/Warnsummer vorhanden und funktionsfähig\n" +
+      "- Funksteuerung (falls vorhanden) mit Testhub geprüft",
+    category: "Sicherheit / Funktion",
+    req: true
   },
 
+  // --- FUNKTIONSPRÜFUNG ---
   {
-    id: "sicherheit_feuerloescher",
-    title: "Feuerlöscher",
-    description:
-      "Prüfe:\n" +
-      "- Plombe intakt\n" +
-      "- Prüffrist gültig",
-    category: "Sicherheit"
-  },
-
-  {
-    id: "sicherheit_funk",
-    title: "Funksteuerung (falls vorhanden)",
-    description:
-      "Prüfe:\n" +
-      "- Akku geladen\n" +
-      "- Sender & Empfänger OK\n" +
-      "- Not-Aus funktioniert",
-    category: "Sicherheit"
-  },
-
-  {
-    id: "funktionstest_fahren",
-    title: "Funktionstest Fahren",
+    id: "funktion_fahren_drehwerk",
+    title: "Fahr- und Drehfunktion",
     description:
       "Kurz prüfen:\n" +
-      "- Bremsen\n" +
-      "- Lenkung\n" +
-      "- Fahrverhalten",
-    category: "Sicherheit"
+      "- Anfahren und Bremsen ohne Auffälligkeiten\n" +
+      "- Drehwerk läuft ruhig, ohne ungewöhnliche Geräusche",
+    category: "Sicherheit / Funktion",
+    req: true
+  },
+  {
+    id: "funktion_winde_lastprobe",
+    title: "Winde / Heben mit kleiner Last",
+    description:
+      "Vor dem eigentlichen Hub:\n" +
+      "- kurzer Probehub mit kleiner Last\n" +
+      "- Winde läuft gleichmäßig\n" +
+      "- keine Stör- oder Fehlermeldungen",
+    category: "Sicherheit / Funktion",
+    req: true
   },
 
+  // --- UMWELT & AUFSTELLUNG ---
   {
-    id: "funktionstest_last",
-    title: "Funktionstest Winde",
+    id: "umwelt_untergrund_freiraum",
+    title: "Untergrund & Freiräume",
     description:
-      "Kurz testen:\n" +
-      "- Winde läuft sauber\n" +
-      "- kein Rucken\n" +
-      "- keine Störmeldungen",
-    category: "Sicherheit"
-  },
-
-  {
-    id: "umwelt_abstand",
-    title: "Abstände & Freiräume",
-    description:
-      "Prüfe:\n" +
-      "- Abstand zu Kanten & Schächten\n" +
-      "- keine Hindernisse im Drehbereich",
-    category: "Umwelt"
-  },
-
-  {
-    id: "umwelt_strom",
-    title: "Abstand zu Stromleitungen",
-    description:
-      "Achte darauf:\n" +
-      "- Mindestabstand eingehalten\n" +
-      "- keine Gefahr durch Überschlag",
-    category: "Umwelt"
-  },
-
-  {
-    id: "umwelt_untergrund",
-    title: "Untergrund tragfähig",
-    description:
-      "Prüfe:\n" +
-      "- Boden tragfähig\n" +
-      "- keine Hohlräume\n" +
-      "- keine Kanaldeckel unter Stützen",
-    category: "Umwelt"
+      "Prüfe am Einsatzort:\n" +
+      "- Untergrund tragfähig, keine Kanaldeckel unter Stützen\n" +
+      "- ausreichend Abstand zu Gräben/Kanten\n" +
+      "- keine Hindernisse im Schwenkbereich des Krans\n" +
+      "- Abstand zu Freileitungen eingehalten",
+    category: "Umwelt / Umfeld",
+    req: true
   }
 ];
+
 
 // Schritt C – Beschreibungen in Platzhalter schreiben
 const mapById = Object.fromEntries(items.map(it => [it.id, it]));
