@@ -1008,162 +1008,147 @@ if (!tlr) errors.push('• Projekt / Baustelle');
     const s=document.getElementById('status'); if(s) s.textContent='PDF gespeichert ('+(blob.size/1024/1024).toFixed(2)+' MB)';
   }catch(err){ alert('PDF-Fehler: '+(err?.message||err)); }
 }
-async function onMail(){
- // NEU: erst prüfen, ob alles ausgefüllt ist
-  if (!validateBeforeSend()) return; 
-  try{
-    const RELAY_URL = 'https://script.google.com/macros/s/AKfycbyl-Wui8XwQJq2lHZb_vaoc-ZCOGpGbn3v2GDd-t0WOj-3M_pADzxEKbvLTvwPKOkQq/exec';
-    const s = document.getElementById('status'); if (s) s.textContent = 'Erzeuge PDF …';
+async function onMail() {
+  // Erst prüfen, ob alles ausgefüllt ist
+  if (!validateBeforeSend()) return;
 
- 
-    // Stammdaten
-    // --- Betreff & Dateiname neu aufbauen ---
-const dateField = document.getElementById('inDate');
-const dtMail = dateField && dateField.value
-  ? dateField.value
-  : formatNowForDisplay();   // Fallback, falls Feld leer
+  try {
+    const RELAY_URL =
+      'https://script.google.com/macros/s/AKfycbyl-Wui8XwQJq2lHZb_vaoc-ZCOGpGbn3v2GDd-t0WOj-3M_pADzxEKbvLTvwPKOkQq/exec';
 
-const tr = document.getElementById('inTr')?.value || 'Kran';
-const tl = document.getElementById('inTl')?.value || 'Projekt/Baustelle';
-const drv = document.getElementById('inOp')?.value || 'Kranführer/in';
+    const s = document.getElementById('status');
+    if (s) s.textContent = 'Erzeuge PDF …';
 
-// Neuer Betreff
-const subject =
-  `[Mobilkran] ${overallSev} – ${tr} / ${tl} – ${dtMail} – ${drv}`;
+    // ---------------- Grunddaten ----------------
+    const dateField = document.getElementById('inDate');
+    const dtMail = dateField && dateField.value
+      ? dateField.value
+      : formatNowForDisplay(); // Fallback
 
-// Dateiname aufräumen (keine Sonderzeichen)
-const safeDate = dtMail.replace(/[^\wäöüÄÖÜß]+/g, '_');
-const filename = `Mobilkran_Kontrolle_${tr}_${tl}_${safeDate}.pdf`;
+    const tr  = document.getElementById('inTr')?.value || 'Zugmaschine';
+    const tl  = document.getElementById('inTl')?.value || 'Auflieger/Modul';
+    const drv = document.getElementById('inOp')?.value || 'Fahrer/in';
 
+    // Gesamtstatus automatisch ermitteln: Mangel > Hinweis > OK
+    const overallStatus = (() => {
+      let sev = 'OK';
+      for (const id in state.res) {
+        const res = state.res[id];
+        if (!res || !res.sev) continue;
+        if (res.sev === 'Mangel') return 'Mangel'; // höchste Priorität
+        if (res.sev === 'Hinweis' && sev === 'OK') sev = 'Hinweis';
+      }
+      return sev;
+    })();
 
+    // Wenn MANGEL → keine Freigabe und KEIN Versand
+    if (overallStatus === 'Mangel') {
+      alert(
+        'Es liegt mindestens ein MANGEL vor.\n' +
+        'Freigabe NICHT ERTEILT – E-Mail wird nicht versendet.'
+      );
+      if (s) s.textContent =
+        'Freigabe NICHT ERTEILT – keine Mail versendet.';
+      return;
+    }
 
-// Gesamtstatus automatisch ermitteln: Mangel > Hinweis > OK
-const overallSev = (() => {
-  let sev = 'OK';
-  for (const id in state.res) {
-    const res = state.res[id];
-    if (!res || !res.sev) continue;
-    if (res.sev === 'Mangel') return 'Mangel'; // höchste Priorität
-    if (res.sev === 'Hinweis' && sev === 'OK') sev = 'Hinweis';
-  }
-  return sev;
-})();
+    // Neuer Betreff
+    const subject =
+      `[Fahrzeugkontrolle] ${overallStatus} – ${tr} / ${tl} – ${dtMail} – ${drv}`;
 
-// Freigabe automatisch aus Gesamtstatus ableiten
-const releaseText = (overallSev === 'Mangel') ? 'NICHT ERTEILT' : 'ERTEILT';
-    
- // Versand komplett verhindern, wenn ein Mangel vorliegt
-if (overallSev === 'Mangel') {
-  alert('Es liegt mindestens ein MANGEL vor.\n' +
-        'Freigabe NICHT ERTEILT – E-Mail wird nicht versendet.');
+    // Dateiname aufräumen
+    const safeDate = dtMail.replace(/[^\wäöüÄÖÜß]+/g, '_');
+    const filename = `Fahrzeugkontrolle_${tr}_${tl}_${safeDate}.pdf`;
 
-  const s = document.getElementById('status');
-  if (s) s.textContent = 'Freigabe NICHT ERTEILT – keine Mail versendet.';
+    // Body-Text: Hauptgruppen + Status
+    const lines = items.map(it => {
+      const r = state.res[it.id] || {};
+      const sev = r.sev || '-';
+      const status =
+        sev === 'Mangel'  ? 'Mangel'  :
+        sev === 'Hinweis' ? 'Hinweis' :
+        'OK';
+      return `${it.title}: ${status}`;
+    });
 
-  return; // >>> hier brichst du onMail() ab, bevor irgendetwas verschickt wird
-}
+    const body = lines.join('\n');
 
-   
+    // Zusatzinfos für GAS
+    const driverName = document.getElementById('inOp')?.value  || '';
+    const truck      = document.getElementById('inTr')?.value  || '';
+    const trailer    = document.getElementById('inTl')?.value  || '';
+    const location   = document.getElementById('inLoc')?.value || '';
 
+    // Geo-Tag
+    const geoTag = (state.geo && state.geo.lat && state.geo.lon)
+      ? `${state.geo.lat}, ${state.geo.lon} (±${state.geo.acc} m)`
+      : '';
 
+    const checkItems = lines;
 
-// Body-Text für die E-Mail: Hauptgruppen + Status
-const lines = items.map(it => {
-  const r = state.res[it.id] || {};
-  const sev = r.sev || '-';
-  const status =
-    sev === 'Mangel'  ? 'Mangel'  :
-    sev === 'Hinweis' ? 'Hinweis' :
-    'OK';
-  return `${it.title}: ${status}`;
-});
-
-const body = lines.join('\n');   // <-- ab hier gibt es "body"
-    // Zusatzinfos für die HTML-Mail an GAS
-const driverName = document.getElementById('inOp')?.value  || '';
-const truck      = document.getElementById('inTr')?.value  || '';
-const trailer    = document.getElementById('inTl')?.value  || '';
-const location   = document.getElementById('inLoc')?.value || '';
-
-// Geo-Tag wie im PDF
-const geoTag = (state.geo && state.geo.lat && state.geo.lon)
-  ? `${state.geo.lat}, ${state.geo.lon} (±${state.geo.acc} m)`
-  : '';
-
-// Die Statuszeilen auch als Checkliste an GAS geben
-const checkItems = lines;
-
-// PDF erstellen
-    lastPdfDriver = driverName;             // <--- NEU: Fahrer für Fußzeile merken
+    // PDF erzeugen
+    lastPdfDriver = driverName;
     const pdfBlob = buildPdf();
     const base64  = await blobToBase64(pdfBlob);
+
     // Empfänger
     const to  = 'Dispo-Memmingen@felbermayr.cc';
     const cc  = (document.getElementById('inCc') ?.value || '').trim();
     const bcc = (document.getElementById('inBcc')?.value || '').trim();
 
-    // HTML aus Text (escapen)
+    // HTML aus Text (für schöne Mail in GAS)
     const html = '<div>' + body
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\n/g,'<br>') + '</div>';
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/\n/g,'<br>') + '</div>';
 
- // Payload korrigiert: body statt bodyText
-const payload = {
-  to,
-  cc,
-  bcc,
-  subject,
-  text: body,      // bleibt wie gehabt
-  html,
-  filename,
-  pdfBase64: base64,
+    // Payload an Google Script
+    const payload = {
+      to,
+      cc,
+      bcc,
+      subject,
+      text: body,
+      html,
+      filename,
+      pdfBase64: base64,
 
-  // NEU: Daten für das schöne HTML in GAS
-  driverName,
-  truck,
-  trailer,
-  location,
-  geoTag,
-  checkItems,
-  overallSev      // den hast du weiter oben schon berechnet
-};
+      driverName,
+      truck,
+      trailer,
+      location,
+      geoTag,
+      checkItems,
+      overallSev: overallStatus   // so heißt das Feld in GAS
+    };
 
-if (s) s.textContent = 'Sende E-Mail …';
-// --- Pflichtprüfung: Ort muss vorhanden sein ---
-if (!location || location.trim() === '') {
-  alert('Ort konnte nicht ermittelt werden.\nBitte GPS prüfen und erneut versuchen.');
-  const s = document.getElementById('status');
-  if (s) s.textContent = '';   // Statusmeldung zurücksetzen
-  return;                      // Versand abbrechen
-}
-// ------------------------------------------------
+    if (s) s.textContent = 'Sende E-Mail …';
 
-try {
-  await fetch(RELAY_URL, {
-    method: 'POST',
-    mode: 'no-cors', // wichtig: keine CORS-Probleme, Antwort wird nicht ausgewertet
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify(payload),
-  });
+    // Ort MUSS vorhanden sein
+    if (!location || location.trim() === '') {
+      alert('Ort konnte nicht ermittelt werden.\nBitte GPS prüfen und erneut versuchen.');
+      if (s) s.textContent = '';
+      return;
+    }
 
-  // Wenn kein Fehler geflogen ist, betrachten wir den Versand als angestoßen
-  if (s) s.textContent = 'Versand angestoßen.';
+    // Versand
+    await fetch(RELAY_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload),
+    });
 
-} catch (err) {
-  console.error(err);
-  alert('Fehler beim Versand: ' + (err?.message || err));
+    if (s) s.textContent = 'Versand angestoßen.';
 
-  const s = document.getElementById('status');
-  if (s) s.textContent = '';
-}
-
-
-
-  } catch (err){
+  } catch (err) {
     console.error(err);
     alert('Fehler beim Versand: ' + (err?.message || err));
-    const s = document.getElementById('status'); if (s) s.textContent = '';
+    const s = document.getElementById('status');
+    if (s) s.textContent = '';
   }
 }
+
 
 
 // === CHECKLISTE + HILFSFUNKTIONEN ===
