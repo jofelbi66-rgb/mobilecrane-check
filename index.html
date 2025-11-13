@@ -957,10 +957,11 @@ function validateBeforeSend() {
   const trk  = document.getElementById('inTr')  ?.value.trim() || '';
   const tlr  = document.getElementById('inTl')  ?.value.trim() || '';
 
-  if (!dt)  errors.push('• Datum/Uhrzeit');
-  if (!drv) errors.push('• Fahrer/in');
-  if (!trk) errors.push('• Zugmaschine');
-  if (!tlr) errors.push('• Auflieger/Modul');
+ if (!dt)  errors.push('• Datum/Uhrzeit');
+if (!drv) errors.push('• Kranführer/in');
+if (!trk) errors.push('• Kran (Kennzeichen/Typ)');
+if (!tlr) errors.push('• Projekt / Baustelle');
+
 
   // Pflicht-Checkpunkte (items mit req === true)
   const missingChecks = items
@@ -1001,7 +1002,7 @@ function validateBeforeSend() {
   try{
     const blob=buildPdf();
     const url=URL.createObjectURL(blob);
-    const a=document.createElement('a'); a.href=url; a.download='Fahrzeugkontrolle.pdf'; a.click();
+    const a=document.createElement('a'); a.href=url; a.download='Mobilkran_Kontrolle.pdf'; a.click();
     URL.revokeObjectURL(url);
     const s=document.getElementById('status'); if(s) s.textContent='PDF gespeichert ('+(blob.size/1024/1024).toFixed(2)+' MB)';
   }catch(err){ alert('PDF-Fehler: '+(err?.message||err)); }
@@ -1021,9 +1022,18 @@ const dtMail = dateField && dateField.value
   ? dateField.value
   : formatNowForDisplay();   // Fallback, falls Feld leer
 
-const tr = document.getElementById('inTr')?.value || 'Zugmaschine';
-const tl = document.getElementById('inTl')?.value || 'Auflieger/Modul';
-const drv = document.getElementById('inOp')?.value || 'Fahrer/in';
+const tr = document.getElementById('inTr')?.value || 'Kran';
+const tl = document.getElementById('inTl')?.value || 'Projekt/Baustelle';
+const drv = document.getElementById('inOp')?.value || 'Kranführer/in';
+
+// Neuer Betreff
+const subject =
+  `[Mobilkran] ${overallSev} – ${tr} / ${tl} – ${dtMail} – ${drv}`;
+
+// Dateiname aufräumen (keine Sonderzeichen)
+const safeDate = dtMail.replace(/[^\wäöüÄÖÜß]+/g, '_');
+const filename = `Mobilkran_Kontrolle_${tr}_${tl}_${safeDate}.pdf`;
+
 
 
 // Gesamtstatus automatisch ermitteln: Mangel > Hinweis > OK
