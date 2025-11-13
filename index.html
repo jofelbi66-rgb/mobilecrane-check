@@ -1064,13 +1064,7 @@ if (overallSev === 'Mangel') {
 
    
 
-// Neuer Betreff
-const subject =
-  `[Fahrzeugkontrolle] ${overallSev} – ${tr} / ${tl} – ${dtMail} – ${drv}`;
 
-// Dateiname aufräumen (keine Sonderzeichen)
-const safeDate = dtMail.replace(/[^\wäöüÄÖÜß]+/g, '_');
-const filename = `Fahrzeugkontrolle_${tr}_${tl}_${safeDate}.pdf`;
 
 // Body-Text für die E-Mail: Hauptgruppen + Status
 const lines = items.map(it => {
