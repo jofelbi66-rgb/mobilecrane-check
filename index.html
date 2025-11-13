@@ -581,18 +581,19 @@ function buildPdf() {
 
 // Kopf
 doc.setFont('helvetica', 'bold');
-doc.setFontSize(12);                   // vorher 14 o.ä.
-line('Fahrzeugkontrolle – Schwerlast/Zugmaschine', true);
+doc.setFontSize(12);
+line('Tägliche Kontrolle Mobilkran', true);
 
 doc.setFont('helvetica', 'normal');
-doc.setFontSize(9);                    // vorher 11
+doc.setFontSize(9);
 line(`Datum/Uhrzeit: ${dtDisplay}`);
 
-line(`Fahrer/in: ${document.getElementById('inOp')?.value || ''}`);
-line(`Zugmaschine: ${document.getElementById('inTr')?.value || ''} | Auflieger/Modul: ${document.getElementById('inTl')?.value || ''}`);
+line(`Kranführer/in: ${document.getElementById('inOp')?.value || ''}`);
+line(`Kran: ${document.getElementById('inTr')?.value || ''} | Projekt/Baustelle: ${document.getElementById('inTl')?.value || ''}`);
 
 const locVal = document.getElementById('inLoc')?.value || '';
-if (locVal) line(`Ort: ${locVal}`);
+if (locVal) line(`Einsatzort: ${locVal}`);
+
 
 if (state.geo) line(`Geotag: ${state.geo.lat}, ${state.geo.lon} (±${state.geo.acc} m)`);
 
